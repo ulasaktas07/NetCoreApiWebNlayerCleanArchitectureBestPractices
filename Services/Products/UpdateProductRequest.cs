@@ -1,2 +1,2 @@
-﻿namespace App.Repositories.Products
-	public record UpdateProductRequest(int Id,string Name, decimal Price, int Stock);
+﻿namespace App.Repositories.Products;
+	public record UpdateProductRequest(string Name, decimal Price, int Stock);
