@@ -31,16 +31,21 @@ namespace App.Services.Products
 
 		public async Task<ServiceResult<List<ProductDto>>> GetPagedAllListAsync(int pageNumber, int pageSize)
 		{
-			var products = await productRepository.GetAll()
-				.Skip((pageNumber - 1) * pageSize)
-				.Take(pageSize)
-				.ToListAsync();
+			var products = await productRepository.GetAll().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 			var productsDto = products.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Stock)).ToList();
 			return ServiceResult<List<ProductDto>>.Success(productsDto);
 		}
 
 		public async Task<ServiceResult<CreateProductResponse>> CreateAsync(CreateProductRequest request)
 		{
+			// async manuel service bussiness check 
+			var anyProduct =await productRepository.Where(x => x.Name == request.Name).AnyAsync();
+			if (anyProduct)
+			{
+				return ServiceResult<CreateProductResponse>.Fail("Ürün ismi daha önce kullanılmıştır. Lütfen farklı bir isim giriniz.");
+			}
+
+
 			var product = new Product()
 			{
 				Name = request.Name,
