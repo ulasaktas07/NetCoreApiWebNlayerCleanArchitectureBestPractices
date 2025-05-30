@@ -1,19 +1,23 @@
 ﻿using App.Repositories;
 using App.Repositories.Products;
+using App.Services.Products.Create;
+using App.Services.Products.Update;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace App.Services.Products
 {
-	public class ProductService(IProductRepository productRepository,IUnitOfWork unitOfWork) : IProductSevice
+	public class ProductService(IProductRepository productRepository,IUnitOfWork unitOfWork,IMapper mapper) : IProductSevice
 	{
 		public async Task<ServiceResult<List<ProductDto>>> GetTopPriceProductsAsync(int count)
 		{
 			var products = await productRepository.GetTopPriceProductsAsync(count);
 
-			var productsDto = products.Select(p => new ProductDto(p.Id,p.Name,p.Price,p.Stock)).ToList();
+			//var productsDto = products.Select(p => new ProductDto(p.Id,p.Name,p.Price,p.Stock)).ToList();
+			var productsDto = mapper.Map<List<ProductDto>>(products);
 
-			return ServiceResult<List<ProductDto>>.Success(productsDto, HttpStatusCode.OK);
+			return ServiceResult<List<ProductDto>>.Success(productsDto);
 		}
 
 
@@ -22,9 +26,10 @@ namespace App.Services.Products
 			var product = await productRepository.GetByIdAsync(id);
 			if (product is null)
 			{
-				ServiceResult<ProductDto>.Fail("Product not found", HttpStatusCode.NotFound);
+				return ServiceResult<ProductDto?>.Fail("Product not found", HttpStatusCode.NotFound);
 			}
-			var productDto = new ProductDto(product!.Id, product.Name, product.Price, product.Stock);
+			//var productDto = new ProductDto(product!.Id, product.Name, product.Price, product.Stock);
+			var productDto = mapper.Map<ProductDto>(product);
 			return ServiceResult<ProductDto>.Success(productDto)!;
 		}
 
@@ -32,7 +37,8 @@ namespace App.Services.Products
 		public async Task<ServiceResult<List<ProductDto>>> GetPagedAllListAsync(int pageNumber, int pageSize)
 		{
 			var products = await productRepository.GetAll().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
-			var productsDto = products.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Stock)).ToList();
+			//var productsDto = products.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Stock)).ToList();
+			var productsDto = mapper.Map<List<ProductDto>>(products);
 			return ServiceResult<List<ProductDto>>.Success(productsDto);
 		}
 
@@ -102,7 +108,8 @@ namespace App.Services.Products
 		public async Task<ServiceResult<List<ProductDto>>> GetAllListAsync()
 		{
 			var products = await productRepository.GetAll().ToListAsync();
-			var productsDto = products.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Stock)).ToList();
+			//var productsDto = products.Select(p => new ProductDto(p.Id, p.Name, p.Price, p.Stock)).ToList();
+			var productsDto = mapper.Map<List<ProductDto>>(products);
 			return ServiceResult<List<ProductDto>>.Success(productsDto);
 		}
 	}
