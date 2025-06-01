@@ -2,6 +2,7 @@
 using App.Repositories.Products;
 using App.Services.Products.Create;
 using App.Services.Products.Update;
+using App.Services.Products.UpdateStock;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -52,12 +53,8 @@ namespace App.Services.Products
 			}
 
 
-			var product = new Product()
-			{
-				Name = request.Name,
-				Price = request.Price,
-				Stock = request.Stock
-			};
+			var product = mapper.Map<Product>(request); 
+
 			await productRepository.AddAsync(product);
 			await unitOfWork.SaveChangesAsync();
 			return ServiceResult<CreateProductResponse>.SuccessAsCreated(new CreateProductResponse(product.Id),$"api/products/{product.Id}");
@@ -68,11 +65,17 @@ namespace App.Services.Products
 			var product = await productRepository.GetByIdAsync(id);
 			if (product is null)
 			{
-				return ServiceResult.Fail("Product not found", HttpStatusCode.NotFound);
+				return ServiceResult.Fail("Güncellenecek ürün bulunamadı", HttpStatusCode.NotFound);
 			}
-			product.Name = request.Name;
-			product.Price = request.Price;
-			product.Stock = request.Stock;
+			var anyProduct = await productRepository.Where(x => x.Name == request.Name && x.Id!=product.Id).AnyAsync();
+			if (anyProduct)
+			{
+				return ServiceResult.Fail("Ürün ismi daha önce kullanılmıştır. Lütfen farklı bir isim giriniz.");
+			}
+
+
+			product = mapper.Map(request, product);
+
 			 productRepository.Update(product);
 			await unitOfWork.SaveChangesAsync();
 			return ServiceResult.Success(HttpStatusCode.NoContent);
