@@ -9,7 +9,7 @@ using System.Net;
 
 namespace App.Services.Categories
 {
-	public class CategoryService(ICategoryRepository categoryRepository,IUnitOfWork unitOfWork,IMapper mapper):ICategoryService
+	public class CategoryService(ICategoryRepository categoryRepository, IUnitOfWork unitOfWork, IMapper mapper) : ICategoryService
 	{
 		public async Task<ServiceResult<CategoryWithProductsDto>> GetCategoryWithProductsAsync(int id)
 		{
@@ -61,24 +61,21 @@ namespace App.Services.Categories
 
 			await categoryRepository.AddAsync(category);
 			await unitOfWork.SaveChangesAsync();
-			return ServiceResult<int>.SuccessAsCreated(category.Id,$"api/categories/{category.Id}");
+			return ServiceResult<int>.SuccessAsCreated(category.Id, $"api/categories/{category.Id}");
 
-		} 
+		}
 
-		public async Task<ServiceResult> UpdateAsync(UpdateCategoryRequest request)
+		public async Task<ServiceResult> UpdateAsync(int id,UpdateCategoryRequest request)
 		{
-			var category = await categoryRepository.GetByIdAsync(request.Id);
-			if (category is null)
-			{
-				return ServiceResult.Fail("Güncellenecek kategori bulunamadı.",HttpStatusCode.NotFound);
-			}
-			var anyCategory = await categoryRepository.Where(x => x.Name == request.Name && x.Id != request.Id).AnyAsync();
+
+			var anyCategory = await categoryRepository.Where(x => x.Name == request.Name && x.Id !=id).AnyAsync();
 			if (anyCategory)
 			{
 				return ServiceResult.Fail("Kategori ismi daha önce kullanılmıştır. Lütfen farklı bir isim giriniz.");
 			}
-			category = mapper.Map(request,category);
-			categoryRepository.Update(category);
+			var category = mapper.Map<Category>(request);
+			category.Id = id;
+			categoryRepository.Update(category!);
 			await unitOfWork.SaveChangesAsync();
 			return ServiceResult.Success(HttpStatusCode.NoContent);
 		}
@@ -86,11 +83,8 @@ namespace App.Services.Categories
 		public async Task<ServiceResult> DeleteAsync(int id)
 		{
 			var category = await categoryRepository.GetByIdAsync(id);
-			if (category is null)
-			{
-				return ServiceResult.Fail("Silinecek kategori bulunamadı.", HttpStatusCode.NotFound);
-			}
-			categoryRepository.Delete(category);
+
+			categoryRepository.Delete(category!);
 			await unitOfWork.SaveChangesAsync();
 			return ServiceResult.Success(HttpStatusCode.NoContent);
 		}

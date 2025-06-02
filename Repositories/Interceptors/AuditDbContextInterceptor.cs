@@ -24,12 +24,16 @@ namespace App.Repositories.Interceptors
 		public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
 		{
 
-			foreach (var entityEntry in eventData.Context.ChangeTracker.Entries().ToList())
+			foreach (var entityEntry in eventData.Context!.ChangeTracker.Entries().ToList())
 			{
 
 				if (entityEntry.Entity is not IAuditEntity auditEntity) continue;
 
+				if (entityEntry.State is not EntityState.Added and not EntityState.Modified) continue;
+
+
 				Behaviors[entityEntry.State](eventData.Context, auditEntity);
+
 
 			}
 

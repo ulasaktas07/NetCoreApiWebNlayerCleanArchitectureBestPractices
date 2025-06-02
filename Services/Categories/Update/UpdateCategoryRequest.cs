@@ -1,4 +1,4 @@
 ﻿namespace App.Services.Categories.Update
 {
-	public record UpdateCategoryRequest(int Id, string Name);
+	public record UpdateCategoryRequest(string Name);
 }

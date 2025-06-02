@@ -1,6 +1,22 @@
 @App.API_HostAddress = http://localhost:5198
 
-GET {{App.API_HostAddress}}/weatherforecast/
+GET {{App.API_HostAddress}}/api/products
 Accept: application/json
 
 ###
+GET {{App.API_HostAddress}}/api/products/{id}
+Accept: application/json
+@id = 1
+GET {{App.API_HostAddress}}/api/products/{{id}}
+Accept: application/json
+###
+POST {{App.API_HostAddress}}/api/products
+Content-Type: application/json
+  {
+  "name": "New Product",
+  "price": 19.99,
+  "description": "This is a new product."
+}
+###
+PUT {{App.API_HostAddress}}/api/products/{id}
+Content-Type: application/json
