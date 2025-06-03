@@ -1,8 +1,8 @@
-﻿using App.Services.Categories.Create;
-using App.Services.Categories.Dto;
-using App.Services.Categories.Update;
+﻿using App.Aplication.Features.Categories.Create;
+using App.Aplication.Features.Categories.Dto;
+using App.Aplication.Features.Categories.Update;
 
-namespace App.Services.Categories
+namespace App.Aplication.Features.Categories
 {
 	public interface ICategoryService
 	{
