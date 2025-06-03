@@ -1,14 +1,12 @@
-﻿using App.Repositories;
-using App.Repositories.Categories;
-using App.Repositories.Products;
-using App.Services.Categories.Create;
-using App.Services.Categories.Dto;
-using App.Services.Categories.Update;
+﻿using App.Aplication.Contract.Persistence;
+using App.Aplication.Features.Categories.Create;
+using App.Aplication.Features.Categories.Dto;
+using App.Aplication.Features.Categories.Update;
+using App.Domain.Entities;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using System.Net;
 
-namespace App.Services.Categories
+namespace App.Aplication.Features.Categories
 {
 	public class CategoryService(ICategoryRepository categoryRepository, IUnitOfWork unitOfWork, IMapper mapper) : ICategoryService
 	{
@@ -25,14 +23,14 @@ namespace App.Services.Categories
 
 		public async Task<ServiceResult<List<CategoryWithProductsDto>>> GetAllCategoriesWithProductsAsync()
 		{
-			var categories = await categoryRepository.GetCategoryByProducts().ToListAsync();
+			var categories = await categoryRepository.GetCategoryByProductsAsync();
 			var categoriesWithProductsDto = mapper.Map<List<CategoryWithProductsDto>>(categories);
 			return ServiceResult<List<CategoryWithProductsDto>>.Success(categoriesWithProductsDto);
 		}
 
 		public async Task<ServiceResult<List<CategoryDto>>> GetAllListAsync()
 		{
-			var categories = await categoryRepository.GetAll().ToListAsync();
+			var categories = await categoryRepository.GetAllAsync();
 			var categoriesAsDto = mapper.Map<List<CategoryDto>>(categories);
 			return ServiceResult<List<CategoryDto>>.Success(categoriesAsDto);
 		}
@@ -51,7 +49,7 @@ namespace App.Services.Categories
 
 		public async Task<ServiceResult<int>> CreateAsync(CreateCategoryRequest request)
 		{
-			var anyCategory = await categoryRepository.Where(x => x.Name == request.Name).AnyAsync();
+			var anyCategory = await categoryRepository.AnyAsync(x => x.Name == request.Name);
 			if (anyCategory)
 			{
 				return ServiceResult<int>.Fail("Kategori ismi daha önce kullanılmıştır. Lütfen farklı bir isim giriniz.");
@@ -69,7 +67,7 @@ namespace App.Services.Categories
 		public async Task<ServiceResult> UpdateAsync(int id,UpdateCategoryRequest request)
 		{
 
-			var anyCategory = await categoryRepository.Where(x => x.Name == request.Name && x.Id !=id).AnyAsync();
+			var anyCategory = await categoryRepository.AnyAsync(x => x.Name == request.Name && x.Id !=id);
 			if (anyCategory)
 			{
 				return ServiceResult.Fail("Kategori ismi daha önce kullanılmıştır. Lütfen farklı bir isim giriniz.");
