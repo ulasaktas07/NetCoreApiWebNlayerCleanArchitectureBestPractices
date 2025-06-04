@@ -1,35 +1,20 @@
 using App.Aplication.Extensions;
 using App.Persistence.Extensions;
-using CleanApp.API.ExceptionHandlers;
-using CleanApp.API.Filters;
+using CleanApp.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddControllersWithFiltersExt().AddSwaggerExt().AddExceptionHandlerExt().AddCachingExt(); // Custom extension method to add controllers with filters
 
-builder.Services.AddControllers(options => {
-	options.Filters.Add<FluentValidationFilter>();
-	options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true; // Suppress implicit required attribute for non-nullable reference types
-});// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddRepositories(builder.Configuration).AddServices(builder.Configuration);
-builder.Services.AddScoped(typeof(NotFoundFilter<,>));
-builder.Services.AddExceptionHandler<CriticalExceptionHandler>();
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-	app.UseSwagger();
-	app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
+app.UseCustomPipelineeExt(); // Custom extension method to use custom pipeline
 
 app.MapControllers();
 

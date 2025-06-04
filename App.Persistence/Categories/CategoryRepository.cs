@@ -1,5 +1,4 @@
-﻿
-using App.Aplication.Contract.Persistence;
+﻿using App.Aplication.Contract.Persistence;
 using App.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
