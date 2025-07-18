@@ -17,3 +17,19 @@ cd NetCoreApiWebNlayerCleanArchitectureBestPractices
 dotnet restore
 dotnet build
 dotnet run --project src/WebApi
+
+🚀 Özellikler
+Clean Architecture uyumlu yapı
+
+Katmanlı mimari
+
+Dependency Injection
+
+Swagger/OpenAPI desteği
+
+Repository & UnitOfWork pattern
+
+EF Core ile veri erişimi
+
+Orta seviye hata yönetimi altyapısı
+
